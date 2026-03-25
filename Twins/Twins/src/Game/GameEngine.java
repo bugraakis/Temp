@@ -1,7 +1,9 @@
 package Game;
 
 import enigma.console.Console;
+import enigma.console.TextAttributes;
 import enigma.core.Enigma;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
@@ -23,6 +25,11 @@ public class GameEngine {
     private GameInputSystem inputSystem;
     private int px, py;
     private int selectedModeOption = 1;
+    private boolean firstLaunch = true;
+
+    private static final Color PLAYER_COLOR = new Color(130, 230, 170);
+    private static final Color FLOOR_BG = new Color(30, 28, 50);
+    private static final Color BG = new Color(20, 20, 40);
 
     public GameEngine() throws Exception {
         cn = Enigma.getConsole("Twins - Maze Game", 200, 50, 12);
@@ -41,18 +48,20 @@ public class GameEngine {
     }
 
     private void clearScreen() {
+        TextAttributes bgAttr = new TextAttributes(BG, BG);
         for (int y = 0; y < 50; y++)
             for (int x = 0; x < 200; x++)
-                cn.getTextWindow().output(x, y, ' ');
+                cn.getTextWindow().output(x, y, ' ', bgAttr);
     }
 
     private void drawText(int x, int y, String text) {
+        TextAttributes attr = new TextAttributes(new Color(200, 195, 220), BG);
         for (int i = 0; i < text.length(); i++)
-            cn.getTextWindow().output(x + i, y, text.charAt(i));
+            cn.getTextWindow().output(x + i, y, text.charAt(i), attr);
     }
 
     private void drawAll(int currentTick) {
-        cn.getTextWindow().output((px * 2) + 4, py + 2, 'A');
+        cn.getTextWindow().output((px * 2) + 4, py + 2, 'A', new TextAttributes(PLAYER_COLOR, FLOOR_BG));
         twin.draw(cn, px, py);
         enemyManager.drawRobots(cn);
         treasureManager.drawTreasures(cn);
@@ -71,6 +80,12 @@ public class GameEngine {
     }
 
     public void start() throws InterruptedException, IOException {
+        if (firstLaunch) {
+            LoadingScreen loading = new LoadingScreen();
+            loading.show(cn);
+            firstLaunch = false;
+        }
+
         while (true) {
             boolean inMenu = true;
             int lastOption = 0;

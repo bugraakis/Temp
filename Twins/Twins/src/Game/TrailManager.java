@@ -1,8 +1,12 @@
 package Game;
 
 import enigma.console.Console;
+import enigma.console.TextAttributes;
+import java.awt.Color;
 
 public class TrailManager {
+
+    private static final Color FLOOR_BG = new Color(30, 28, 50);
 
     private class Trail {
         int x, y, spawnTick;
@@ -18,9 +22,10 @@ public class TrailManager {
     }
 
     public void clearOldTrails(Console cn, int currentTick) {
+        TextAttributes floorAttr = new TextAttributes(FLOOR_BG, FLOOR_BG);
         for (int i = 0; i < trailCount; i++) {
             if (currentTick - trails[i].spawnTick >= 2) {
-                cn.getTextWindow().output((trails[i].x * 2) + 4, trails[i].y + 2, ' ');
+                cn.getTextWindow().output((trails[i].x * 2) + 4, trails[i].y + 2, ' ', floorAttr);
                 trails[i] = trails[--trailCount];
                 trails[trailCount] = null;
                 i--;

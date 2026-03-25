@@ -10,6 +10,8 @@ public class PackedLaser {
 
     private static final int OFFSET_X = 4;
     private static final int OFFSET_Y = 2;
+    private static final Color PACK_COLOR = new Color(255, 220, 130);
+    private static final Color FLOOR_BG = new Color(30, 28, 50);
 
     public PackedLaser(int x, int y) {
         this.x = x;
@@ -19,11 +21,11 @@ public class PackedLaser {
 
     public void draw(Console cn) {
         if (collected) return;
-        cn.getTextWindow().output((x * 2) + OFFSET_X, y + OFFSET_Y, '@', new TextAttributes(Color.YELLOW, Color.BLACK));
+        cn.getTextWindow().output((x * 2) + OFFSET_X, y + OFFSET_Y, '@', new TextAttributes(PACK_COLOR, FLOOR_BG));
     }
 
     public void erase(Console cn) {
-        cn.getTextWindow().output((x * 2) + OFFSET_X, y + OFFSET_Y, ' ');
+        cn.getTextWindow().output((x * 2) + OFFSET_X, y + OFFSET_Y, ' ', new TextAttributes(FLOOR_BG, FLOOR_BG));
     }
 
     public boolean checkPickup(int playerX, int playerY) {

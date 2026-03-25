@@ -1,6 +1,8 @@
 package Game;
 
 import enigma.console.Console;
+import enigma.console.TextAttributes;
+import java.awt.Color;
 import java.util.Random;
 
 public class XRobot {
@@ -8,6 +10,9 @@ public class XRobot {
     public int lifePoints = 1000;
     private int currentDir;
     private Random rnd = new Random();
+
+    private static final Color ROBOT_COLOR = new Color(255, 150, 150);
+    private static final Color FLOOR_BG = new Color(30, 28, 50);
 
     public XRobot(int startX, int startY) { this.x = startX; this.y = startY; currentDir = rnd.nextInt(4); }
 
@@ -30,5 +35,7 @@ public class XRobot {
         }
     }
 
-    public void draw(Console cn) { cn.getTextWindow().output((x * 2) + 4, y + 2, 'X'); }
+    public void draw(Console cn) {
+        cn.getTextWindow().output((x * 2) + 4, y + 2, 'X', new TextAttributes(ROBOT_COLOR, FLOOR_BG));
+    }
 }

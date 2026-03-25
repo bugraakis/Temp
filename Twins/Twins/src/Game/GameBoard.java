@@ -10,6 +10,10 @@ public class GameBoard {
     private int mapWidth;
     private int mapHeight;
 
+    private static final Color WALL_FG = new Color(140, 120, 180);
+    private static final Color WALL_BG = new Color(90, 75, 120);
+    private static final Color FLOOR_BG = new Color(30, 28, 50);
+
     public GameBoard(int width, int height) {
         mapWidth = width;
         mapHeight = height;
@@ -25,8 +29,8 @@ public class GameBoard {
     }
 
     public void printBoard(Console console) {
-        TextAttributes wallColor  = new TextAttributes(Color.WHITE, Color.WHITE);
-        TextAttributes emptyColor = new TextAttributes(Color.BLACK, Color.BLACK);
+        TextAttributes wallColor  = new TextAttributes(WALL_FG, WALL_BG);
+        TextAttributes emptyColor = new TextAttributes(FLOOR_BG, FLOOR_BG);
 
         for (int i = 0; i < mapHeight; i++) {
             for (int j = 0; j < mapWidth; j++) {

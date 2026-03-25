@@ -13,6 +13,18 @@ public class ScoreManager {
     private static final int HUD_X = 120;
     private static final int HUD_Y = 2;
 
+    private static final Color BG = new Color(20, 20, 40);
+    private static final Color LABEL = new Color(200, 195, 220);
+    private static final Color SCORE_P = new Color(150, 255, 200);
+    private static final Color AMMO_C = new Color(255, 220, 130);
+    private static final Color ENEMY_C = new Color(255, 150, 150);
+    private static final Color HP_HIGH = new Color(130, 230, 170);
+    private static final Color HP_MID = new Color(255, 220, 130);
+    private static final Color HP_LOW = new Color(255, 140, 140);
+    private static final Color HUD_KEY = new Color(170, 160, 220);
+    private static final Color GAMEOVER = new Color(255, 130, 150);
+    private static final Color FINAL_SC = new Color(255, 230, 160);
+
     public ScoreManager() {
         this.score = 0;
         this.health = 1000;
@@ -29,41 +41,40 @@ public class ScoreManager {
     public boolean isAlive() { return health > 0; }
 
     public void drawHUD(Console cn, int ammo, int computerScore, int cRobots, int xRobots, int ticks) {
-        TextAttributes healthColor;
-        if (health > 600) healthColor = new TextAttributes(Color.GREEN, Color.BLACK);
-        else if (health > 300) healthColor = new TextAttributes(Color.YELLOW, Color.BLACK);
-        else healthColor = new TextAttributes(Color.RED, Color.BLACK);
-
-        TextAttributes labelColor = new TextAttributes(Color.WHITE, Color.BLACK);
-        TextAttributes hudColor = new TextAttributes(Color.CYAN, Color.BLACK);
+        Color hpColor;
+        if (health > 600) hpColor = HP_HIGH;
+        else if (health > 300) hpColor = HP_MID;
+        else hpColor = HP_LOW;
 
         clearHUDArea(cn);
 
-        drawString(cn, HUD_X, HUD_Y, "Time : " + (ticks / 20), labelColor);
-        drawString(cn, HUD_X, HUD_Y + 2, "P.Score : " + score, new TextAttributes(Color.GREEN, Color.BLACK));
-        drawString(cn, HUD_X, HUD_Y + 3, "P.Life  : " + health, healthColor);
-        drawString(cn, HUD_X, HUD_Y + 4, "P.Laser : " + ammo, new TextAttributes(Color.YELLOW, Color.BLACK));
-        drawString(cn, HUD_X, HUD_Y + 6, "C.Score : " + computerScore, new TextAttributes(Color.RED, Color.BLACK));
-        drawString(cn, HUD_X, HUD_Y + 7, "C-Robots: " + cRobots, labelColor);
-        drawString(cn, HUD_X, HUD_Y + 8, "X-Robots: " + xRobots, labelColor);
-        drawString(cn, HUD_X, HUD_Y + 10, "[SPACE] Shoot", hudColor);
-        drawString(cn, HUD_X, HUD_Y + 11, "[M] Toggle Mode", hudColor);
-        drawString(cn, HUD_X, HUD_Y + 12, "[ESC] Save/Quit", hudColor);
+        drawString(cn, HUD_X, HUD_Y, "Time : " + (ticks / 20), LABEL);
+        drawString(cn, HUD_X, HUD_Y + 2, "P.Score : " + score, SCORE_P);
+        drawString(cn, HUD_X, HUD_Y + 3, "P.Life  : " + health, hpColor);
+        drawString(cn, HUD_X, HUD_Y + 4, "P.Laser : " + ammo, AMMO_C);
+        drawString(cn, HUD_X, HUD_Y + 6, "C.Score : " + computerScore, ENEMY_C);
+        drawString(cn, HUD_X, HUD_Y + 7, "C-Robots: " + cRobots, LABEL);
+        drawString(cn, HUD_X, HUD_Y + 8, "X-Robots: " + xRobots, LABEL);
+        drawString(cn, HUD_X, HUD_Y + 10, "[SPACE] Shoot", HUD_KEY);
+        drawString(cn, HUD_X, HUD_Y + 11, "[M] Toggle Mode", HUD_KEY);
+        drawString(cn, HUD_X, HUD_Y + 12, "[ESC] Save/Quit", HUD_KEY);
     }
 
     public void drawGameOver(Console cn) {
-        drawString(cn, HUD_X, HUD_Y + 15, "GAME OVER!", new TextAttributes(Color.RED, Color.BLACK));
-        drawString(cn, HUD_X, HUD_Y + 16, "Final Score: " + score, new TextAttributes(Color.YELLOW, Color.BLACK));
-        drawString(cn, HUD_X, HUD_Y + 18, "Press ESC to exit", new TextAttributes(Color.WHITE, Color.BLACK));
+        drawString(cn, HUD_X, HUD_Y + 15, "GAME OVER!", GAMEOVER);
+        drawString(cn, HUD_X, HUD_Y + 16, "Final Score: " + score, FINAL_SC);
+        drawString(cn, HUD_X, HUD_Y + 18, "Press ESC to exit", LABEL);
     }
 
     private void clearHUDArea(Console cn) {
+        TextAttributes bgAttr = new TextAttributes(BG, BG);
         for (int row = HUD_Y; row < HUD_Y + 20; row++)
             for (int col = HUD_X; col < HUD_X + 30; col++)
-                cn.getTextWindow().output(col, row, ' ');
+                cn.getTextWindow().output(col, row, ' ', bgAttr);
     }
 
-    private void drawString(Console cn, int x, int y, String text, TextAttributes attr) {
+    private void drawString(Console cn, int x, int y, String text, Color fg) {
+        TextAttributes attr = new TextAttributes(fg, BG);
         for (int i = 0; i < text.length(); i++)
             cn.getTextWindow().output(x + i, y, text.charAt(i), attr);
     }
