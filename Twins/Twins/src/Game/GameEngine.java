@@ -60,6 +60,30 @@ public class GameEngine {
             cn.getTextWindow().output(x + i, y, text.charAt(i), attr);
     }
 
+    private void drawColorText(int x, int y, String text, Color fg) {
+        TextAttributes attr = new TextAttributes(fg, BG);
+        for (int i = 0; i < text.length(); i++)
+            cn.getTextWindow().output(x + i, y, text.charAt(i), attr);
+    }
+
+    private void showSizeConfirmation() throws InterruptedException {
+        clearScreen();
+        Color title = new Color(180, 150, 255);
+        Color info = new Color(150, 210, 255);
+        Color hint = new Color(170, 165, 200);
+        Color accent = new Color(160, 240, 190);
+
+        drawColorText(75, 12, "--- CONSOLE SETUP ---", title);
+        drawColorText(68, 15, "Please resize your console window to:", info);
+        drawColorText(78, 17, "200 columns x 50 rows", accent);
+        drawColorText(79, 18, "Font size: 12", accent);
+        drawColorText(65, 21, "Make sure the window fits your screen properly.", hint);
+        drawColorText(70, 23, "Press [ENTER] when ready to continue", hint);
+
+        while (controls.consumeKey() != KeyEvent.VK_ENTER) Thread.sleep(50);
+        clearScreen();
+    }
+
     private void drawAll(int currentTick) {
         cn.getTextWindow().output((px * 2) + 4, py + 2, 'A', new TextAttributes(PLAYER_COLOR, FLOOR_BG));
         twin.draw(cn, px, py);
@@ -81,8 +105,7 @@ public class GameEngine {
 
     public void start() throws InterruptedException, IOException {
         if (firstLaunch) {
-            LoadingScreen loading = new LoadingScreen();
-            loading.show(cn);
+            showSizeConfirmation();
             firstLaunch = false;
         }
 
@@ -114,6 +137,8 @@ public class GameEngine {
             RandomSpawner spawner = new RandomSpawner();
 
             if (selectedModeOption == 1) {
+                LoadingScreen loading = new LoadingScreen();
+                loading.show(cn);
                 board = new GameBoard(55, 25);
                 int[] playerSpawn = spawner.getSpawnPoint(board.getMap());
                 px = playerSpawn[0]; py = playerSpawn[1];
