@@ -6,13 +6,10 @@ public class LaserManager {
 
     private LaserBeam[] lasers = new LaserBeam[500];
     private int laserCount = 0;
-
     private PackedLaser[] packs = new PackedLaser[20];
     private int packCount = 0;
-
     private int ammo = 0;
 
-    // Active fire line
     private int[] lineX = new int[100];
     private int[] lineY = new int[100];
     private int lineLength = 0;
@@ -21,25 +18,15 @@ public class LaserManager {
     private boolean firing = false;
 
     public void fireLaser(int ax, int ay, int bx, int by, int tick) {
-        if (ammo <= 0) return;
-        if (ax == bx && ay == by) return;
+        if (ammo <= 0 || (ax == bx && ay == by)) return;
 
-        // Compute line from A to B using Bresenham
         lineLength = 0;
-        int x0 = ax;
-        int y0 = ay;
-        int x1 = bx;
-        int y1 = by;
-
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
+        int x0 = ax, y0 = ay;
+        int dx = Math.abs(bx - x0), dy = Math.abs(by - y0);
+        int sx = x0 < bx ? 1 : -1, sy = y0 < by ? 1 : -1;
         int err = dx - dy;
 
-        // Skip the starting point (A's position)
-        while (true) {
-            if (x0 == x1 && y0 == y1) break;
+        while (!(x0 == bx && y0 == by)) {
             int e2 = 2 * err;
             if (e2 > -dy) { err -= dy; x0 += sx; }
             if (e2 < dx) { err += dx; y0 += sy; }
@@ -60,44 +47,28 @@ public class LaserManager {
 
     public void updateFiring(char[][] map, int currentTick) {
         if (!firing) return;
-
         int ticksElapsed = currentTick - fireStartTick;
         while (lineIndex < lineLength && lineIndex <= ticksElapsed) {
-            int lx = lineX[lineIndex];
-            int ly = lineY[lineIndex];
-
-            // Only place on empty squares
-            if (ly >= 0 && ly < map.length && lx >= 0 && lx < map[0].length) {
-                if (map[ly][lx] != '#') {
-                    if (laserCount < lasers.length) {
-                        lasers[laserCount] = new LaserBeam(lx, ly, currentTick);
-                        laserCount++;
-                    }
+            int lx = lineX[lineIndex], ly = lineY[lineIndex];
+            if (ly >= 0 && ly < map.length && lx >= 0 && lx < map[0].length && map[ly][lx] != '#') {
+                if (laserCount < lasers.length) {
+                    lasers[laserCount++] = new LaserBeam(lx, ly, currentTick);
                 }
             }
             lineIndex++;
         }
-
-        if (lineIndex >= lineLength) {
-            firing = false;
-        }
+        if (lineIndex >= lineLength) firing = false;
     }
 
     public int checkNeighborDamage(EnemyManager enemies, Console cn) {
         int kills = 0;
+        int[][] dirs = {{0,-1},{0,1},{-1,0},{1,0}};
         for (int i = 0; i < laserCount; i++) {
-            if (!lasers[i].isActive()) continue;
-            int lx = lasers[i].getX();
-            int ly = lasers[i].getY();
-
-            // Check 4 neighbors
-            int[][] dirs = {{0,-1},{0,1},{-1,0},{1,0}};
+            int lx = lasers[i].getX(), ly = lasers[i].getY();
             for (int[] d : dirs) {
-                int nx = lx + d[0];
-                int ny = ly + d[1];
-                if (enemies.isRobotAt(nx, ny)) {
+                int nx = lx + d[0], ny = ly + d[1];
+                if (enemies.isRobotAt(nx, ny))
                     kills += enemies.damageRobotAt(nx, ny, 50, cn);
-                }
             }
         }
         return kills;
@@ -106,9 +77,8 @@ public class LaserManager {
     public void cleanExpiredLasers(Console cn, int currentTick) {
         int writeIdx = 0;
         for (int i = 0; i < laserCount; i++) {
-            if (lasers[i].isActive() && !lasers[i].isExpired(currentTick)) {
-                lasers[writeIdx] = lasers[i];
-                writeIdx++;
+            if (!lasers[i].isExpired(currentTick)) {
+                lasers[writeIdx++] = lasers[i];
             } else {
                 lasers[i].erase(cn);
             }
@@ -117,18 +87,13 @@ public class LaserManager {
     }
 
     public void drawLasers(Console cn) {
-        for (int i = 0; i < laserCount; i++) {
-            if (lasers[i].isActive()) {
-                lasers[i].draw(cn);
-            }
-        }
+        for (int i = 0; i < laserCount; i++) lasers[i].draw(cn);
     }
 
     public void spawnPackedLaser(char[][] map, RandomSpawner spawner) {
         if (packCount < packs.length) {
             int[] pos = spawner.getSpawnPoint(map);
-            packs[packCount] = new PackedLaser(pos[0], pos[1]);
-            packCount++;
+            packs[packCount++] = new PackedLaser(pos[0], pos[1]);
         }
     }
 
@@ -156,20 +121,8 @@ public class LaserManager {
     }
 
     public void drawPacks(Console cn) {
-        for (int i = 0; i < packCount; i++) {
-            if (!packs[i].isCollected()) {
-                packs[i].draw(cn);
-            }
-        }
-    }
-
-    public boolean isLaserAt(int x, int y) {
-        for (int i = 0; i < laserCount; i++) {
-            if (lasers[i].isActive() && lasers[i].getX() == x && lasers[i].getY() == y) {
-                return true;
-            }
-        }
-        return false;
+        for (int i = 0; i < packCount; i++)
+            if (!packs[i].isCollected()) packs[i].draw(cn);
     }
 
     public int getAmmo() { return ammo; }

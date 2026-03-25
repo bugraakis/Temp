@@ -5,9 +5,7 @@ import enigma.console.TextAttributes;
 import java.awt.Color;
 
 public class Treasure {
-    private int x;
-    private int y;
-    private int value; // 1, 2, or 3
+    private int x, y, value;
     private boolean collected;
 
     private static final int OFFSET_X = 4;
@@ -23,42 +21,30 @@ public class Treasure {
     public int getPlayerPoints() {
         if (value == 1) return 3;
         if (value == 2) return 10;
-        if (value == 3) return 30;
-        return 0;
+        return 30;
     }
 
     public int getComputerPoints() {
         if (value == 1) return 9;
         if (value == 2) return 30;
-        if (value == 3) return 90;
-        return 0;
+        return 90;
     }
 
     public void draw(Console cn) {
         if (collected) return;
-        TextAttributes color = new TextAttributes(Color.YELLOW, Color.BLACK);
-        int screenX = (x * 2) + OFFSET_X;
-        int screenY = y + OFFSET_Y;
-        cn.getTextWindow().output(screenX, screenY, (char)('0' + value), color);
+        cn.getTextWindow().output((x * 2) + OFFSET_X, y + OFFSET_Y, (char)('0' + value), new TextAttributes(Color.YELLOW, Color.BLACK));
     }
 
     public void erase(Console cn) {
-        int screenX = (x * 2) + OFFSET_X;
-        int screenY = y + OFFSET_Y;
-        cn.getTextWindow().output(screenX, screenY, ' ');
+        cn.getTextWindow().output((x * 2) + OFFSET_X, y + OFFSET_Y, ' ');
     }
 
     public boolean checkPickup(int px, int py) {
-        if (!collected && x == px && y == py) {
-            collected = true;
-            return true;
-        }
+        if (!collected && x == px && y == py) { collected = true; return true; }
         return false;
     }
 
     public boolean isCollected() { return collected; }
     public int getX() { return x; }
     public int getY() { return y; }
-    public int getValue() { return value; }
-    public void collect() { collected = true; }
 }

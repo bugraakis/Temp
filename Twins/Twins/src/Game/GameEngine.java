@@ -12,19 +12,15 @@ public class GameEngine {
     private Timer timer;
     private TrailManager trailManager;
     private EnemyManager enemyManager;
-
     private BModeManager modeManager;
     private BCharacter twin;
     private MoveTrack tracker;
-
     private ModeMenuUI modeMenu;
     private TitleScreen gameLogo;
-
     private LaserManager laserManager;
     private ScoreManager scoreManager;
     private TreasureManager treasureManager;
     private GameInputSystem inputSystem;
-
     private int px, py;
     private int selectedModeOption = 1;
 
@@ -34,13 +30,10 @@ public class GameEngine {
         timer = new Timer();
         trailManager = new TrailManager();
         enemyManager = new EnemyManager();
-
         modeManager = new BModeManager();
         tracker = new MoveTrack();
-
         modeMenu = new ModeMenuUI();
         gameLogo = new TitleScreen();
-
         laserManager = new LaserManager();
         scoreManager = new ScoreManager();
         treasureManager = new TreasureManager();
@@ -48,21 +41,36 @@ public class GameEngine {
     }
 
     private void clearScreen() {
-        for (int y = 0; y < 50; y++) {
-            for (int x = 0; x < 200; x++) {
+        for (int y = 0; y < 50; y++)
+            for (int x = 0; x < 200; x++)
                 cn.getTextWindow().output(x, y, ' ');
-            }
-        }
     }
 
     private void drawText(int x, int y, String text) {
-        for (int i = 0; i < text.length(); i++) {
+        for (int i = 0; i < text.length(); i++)
             cn.getTextWindow().output(x + i, y, text.charAt(i));
-        }
+    }
+
+    private void drawAll(int currentTick) {
+        cn.getTextWindow().output((px * 2) + 4, py + 2, 'A');
+        twin.draw(cn, px, py);
+        enemyManager.drawRobots(cn);
+        treasureManager.drawTreasures(cn);
+        laserManager.drawLasers(cn);
+        laserManager.drawPacks(cn);
+        scoreManager.drawHUD(cn, laserManager.getAmmo(), enemyManager.getComputerScore(),
+                enemyManager.getCRobotCount(), enemyManager.getRobotCount(), currentTick);
+    }
+
+    private void resetState() {
+        enemyManager = new EnemyManager();
+        timer = new Timer();
+        trailManager = new TrailManager();
+        modeManager = new BModeManager();
+        tracker = new MoveTrack();
     }
 
     public void start() throws InterruptedException, IOException {
-
         while (true) {
             boolean inMenu = true;
             int lastOption = 0;
@@ -74,20 +82,16 @@ public class GameEngine {
                     modeMenu.drawMenu(cn, selectedModeOption, 80, 20);
                     lastOption = selectedModeOption;
                 }
-
                 int key = controls.consumeKey();
                 if (key != 0) {
-                    if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
+                    if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN)
                         selectedModeOption = (selectedModeOption == 1) ? 2 : 1;
-                    } else if (key == KeyEvent.VK_ENTER) {
-                        inMenu = false;
-                    }
+                    else if (key == KeyEvent.VK_ENTER) inMenu = false;
                 }
                 Thread.sleep(50);
             }
 
             clearScreen();
-
             laserManager = new LaserManager();
             scoreManager = new ScoreManager();
             treasureManager = new TreasureManager();
@@ -96,205 +100,114 @@ public class GameEngine {
 
             if (selectedModeOption == 1) {
                 board = new GameBoard(55, 25);
-
                 int[] playerSpawn = spawner.getSpawnPoint(board.getMap());
-                px = playerSpawn[0];
-                py = playerSpawn[1];
+                px = playerSpawn[0]; py = playerSpawn[1];
                 twin = new BCharacter(px, py);
-
-                // Spawn initial 10 elements via game input system
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 10; i++)
                     inputSystem.spawnElement(board.getMap(), treasureManager, laserManager, enemyManager);
-                }
-
             } else {
                 if (!SaveLoad.saveExists()) {
                     drawText(70, 22, "No old maps please change your option");
                     drawText(70, 24, "Press ESC");
-
-                    boolean waiting = true;
-                    while (waiting) {
-                        int key = controls.consumeKey();
-                        if (key == KeyEvent.VK_ESCAPE) {
-                            waiting = false;
-                        }
-                        Thread.sleep(50);
-                    }
-
+                    while (controls.consumeKey() != KeyEvent.VK_ESCAPE) Thread.sleep(50);
                     clearScreen();
-                    enemyManager = new EnemyManager();
-                    timer  = new Timer();
-                    trailManager = new TrailManager();
-                    modeManager  = new BModeManager();
-                    tracker      = new MoveTrack();
+                    resetState();
                     continue;
                 }
 
-                int[] result       = new int[7];
-                int[] xRobotX      = new int[100];
-                int[] xRobotY      = new int[100];
-                int[] xRobotLife   = new int[100];
+                int[] result = new int[7];
+                int[] xRobotX = new int[100], xRobotY = new int[100], xRobotLife = new int[100];
                 char[][] loadedMap = new char[25][55];
-
                 SaveLoad.loadGame(result, xRobotX, xRobotY, xRobotLife, loadedMap);
 
-                px = result[0];
-                py = result[1];
+                px = result[0]; py = result[1];
                 twin = new BCharacter(result[2], result[3]);
                 modeManager.setMode(result[4]);
                 timer.setTicks(result[5]);
-                int robotCount = result[6];
-
                 board = new GameBoard(loadedMap);
-
-                for (int i = 0; i < robotCount; i++) {
+                for (int i = 0; i < result[6]; i++)
                     enemyManager.addXRobot(xRobotX[i], xRobotY[i], xRobotLife[i]);
-                }
-
-                // Spawn initial 10 elements for loaded games too
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 10; i++)
                     inputSystem.spawnElement(board.getMap(), treasureManager, laserManager, enemyManager);
-                }
             }
 
             board.printBoard(cn);
-            cn.getTextWindow().output((px * 2) + 4, py + 2, 'A');
-            twin.draw(cn, px, py);
-            enemyManager.drawRobots(cn);
-            treasureManager.drawTreasures(cn);
-            laserManager.drawPacks(cn);
-            scoreManager.drawHUD(cn, laserManager.getAmmo(), enemyManager.getComputerScore(),
-                    enemyManager.getCRobotCount(), enemyManager.getXRobotCount(), timer.getTicks());
-
+            drawAll(timer.getTicks());
             boolean gameOver = false;
 
             while (true) {
                 timer.Play();
                 int currentTick = timer.getTicks();
-
                 int key = controls.consumeKey();
-                int nextX = px;
-                int nextY = py;
-                int moveX = 0;
-                int moveY = 0;
+                int nextX = px, nextY = py, moveX = 0, moveY = 0;
                 boolean playerMoved = false;
 
                 if (key != 0) {
-
                     if (key == KeyEvent.VK_ESCAPE) {
                         if (!gameOver) {
-                            int robotCount = enemyManager.getRobotCount();
-                            int[] rxArr    = new int[robotCount];
-                            int[] ryArr    = new int[robotCount];
-                            int[] rLifeArr = new int[robotCount];
-                            for (int i = 0; i < robotCount; i++) {
-                                rxArr[i]    = enemyManager.getRobotX(i);
-                                ryArr[i]    = enemyManager.getRobotY(i);
+                            int rc = enemyManager.getRobotCount();
+                            int[] rxArr = new int[rc], ryArr = new int[rc], rLifeArr = new int[rc];
+                            for (int i = 0; i < rc; i++) {
+                                rxArr[i] = enemyManager.getRobotX(i);
+                                ryArr[i] = enemyManager.getRobotY(i);
                                 rLifeArr[i] = enemyManager.getRobotLife(i);
                             }
-                            SaveLoad.saveGame(
-                                    px, py,
-                                    twin.getX(), twin.getY(), modeManager.getMode(),
-                                    currentTick,
-                                    rxArr, ryArr, rLifeArr, robotCount,
-                                    board.getMap()
-                            );
+                            SaveLoad.saveGame(px, py, twin.getX(), twin.getY(), modeManager.getMode(),
+                                    currentTick, rxArr, ryArr, rLifeArr, rc, board.getMap());
                         }
-                        enemyManager = new EnemyManager();
-                        timer = new Timer();
-                        trailManager = new TrailManager();
-                        modeManager  = new BModeManager();
-                        tracker      = new MoveTrack();
+                        resetState();
                         clearScreen();
                         break;
                     }
 
                     if (gameOver) continue;
 
-                    if (key == KeyEvent.VK_M || key == 'm' || key == 'M') {
-                        modeManager.toggleMode();
-                    }
+                    if (key == KeyEvent.VK_M || key == 'm' || key == 'M') modeManager.toggleMode();
+                    if (key == KeyEvent.VK_SPACE) laserManager.fireLaser(px, py, twin.getX(), twin.getY(), currentTick);
 
-                    // SPACE to fire laser from A to B
-                    if (key == KeyEvent.VK_SPACE) {
-                        laserManager.fireLaser(px, py, twin.getX(), twin.getY(), currentTick);
-                    }
-
-                    if (key == KeyEvent.VK_LEFT)      { nextX--; moveX = -1; playerMoved = true; }
-                    else if (key == KeyEvent.VK_RIGHT) { nextX++; moveX =  1; playerMoved = true; }
-                    else if (key == KeyEvent.VK_UP)    { nextY--; moveY = -1; playerMoved = true; }
-                    else if (key == KeyEvent.VK_DOWN)  { nextY++; moveY =  1; playerMoved = true; }
+                    if (key == KeyEvent.VK_LEFT)       { nextX--; moveX = -1; playerMoved = true; }
+                    else if (key == KeyEvent.VK_RIGHT)  { nextX++; moveX =  1; playerMoved = true; }
+                    else if (key == KeyEvent.VK_UP)     { nextY--; moveY = -1; playerMoved = true; }
+                    else if (key == KeyEvent.VK_DOWN)   { nextY++; moveY =  1; playerMoved = true; }
 
                     tracker.setLastMove(moveX, moveY);
-
                     CollisionControl cd = new CollisionControl();
                     if (playerMoved && cd.canPlayerMove(board.getMap(), nextX, nextY, enemyManager)) {
                         trailManager.addTrail(px, py, currentTick);
-                        px = nextX;
-                        py = nextY;
+                        px = nextX; py = nextY;
                     }
-
-                    if (playerMoved && (moveX != 0 || moveY != 0)) {
+                    if (playerMoved && (moveX != 0 || moveY != 0))
                         twin.move(tracker, board, modeManager.getMode(), trailManager, currentTick, enemyManager);
-                    }
 
-                    // Check laser pack pickups for A
                     laserManager.checkPickups(px, py, cn);
-                    // Check laser pack pickups for B
                     laserManager.checkPickupB(twin.getX(), twin.getY(), cn);
-
-                    // Check treasure pickups for A and B
-                    int tPoints = treasureManager.checkPlayerPickup(px, py, cn);
-                    if (tPoints > 0) scoreManager.addScore(tPoints);
-                    tPoints = treasureManager.checkPlayerPickup(twin.getX(), twin.getY(), cn);
-                    if (tPoints > 0) scoreManager.addScore(tPoints);
+                    int tp = treasureManager.checkPlayerPickup(px, py, cn);
+                    if (tp > 0) scoreManager.addScore(tp);
+                    tp = treasureManager.checkPlayerPickup(twin.getX(), twin.getY(), cn);
+                    if (tp > 0) scoreManager.addScore(tp);
                 }
 
                 if (!gameOver) {
-                    // Update laser firing (spread one block per tick)
                     laserManager.updateFiring(board.getMap(), currentTick);
-
-                    // Check neighbor damage from laser blocks to robots
                     int kills = laserManager.checkNeighborDamage(enemyManager, cn);
-                    if (kills > 0) {
-                        scoreManager.addScore(100 * kills);
-                    }
-
-                    // Remove expired laser blocks (lifetime 100 ticks)
+                    if (kills > 0) scoreManager.addScore(100 * kills);
                     laserManager.cleanExpiredLasers(cn, currentTick);
 
-                    if (timer.isRobotTurn()) {
+                    if (timer.isRobotTurn())
                         enemyManager.moveRobots(board, trailManager, currentTick, px, py, twin, treasureManager);
-                    }
+                    if (enemyManager.isAdjacentToPlayer(px, py)) scoreManager.takeDamage(50);
 
-                    // Check if robots are adjacent to player A - take 50 damage
-                    if (enemyManager.isAdjacentToPlayer(px, py)) {
-                        scoreManager.takeDamage(50);
-                    }
-
-                    // Check if player is dead
                     if (!scoreManager.isAlive()) {
                         gameOver = true;
                         scoreManager.drawGameOver(cn);
                     }
 
-                    // Game input system: spawn new element every 20 ticks (1 second)
-                    if (currentTick % 20 == 0 && currentTick > 0) {
+                    if (currentTick % 20 == 0 && currentTick > 0)
                         inputSystem.spawnElement(board.getMap(), treasureManager, laserManager, enemyManager);
-                    }
                 }
 
                 trailManager.clearOldTrails(cn, currentTick);
-
-                cn.getTextWindow().output((px * 2) + 4, py + 2, 'A');
-                twin.draw(cn, px, py);
-                enemyManager.drawRobots(cn);
-                treasureManager.drawTreasures(cn);
-                laserManager.drawLasers(cn);
-                laserManager.drawPacks(cn);
-                scoreManager.drawHUD(cn, laserManager.getAmmo(), enemyManager.getComputerScore(),
-                        enemyManager.getCRobotCount(), enemyManager.getXRobotCount(), currentTick);
-
+                drawAll(currentTick);
             }
         }
     }

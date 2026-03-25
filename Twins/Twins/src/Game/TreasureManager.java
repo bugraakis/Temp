@@ -34,7 +34,6 @@ public class TreasureManager {
         return 0;
     }
 
-    // Find nearest treasure for C-Robot (Manhattan distance)
     public int[] findNearestTreasure(int rx, int ry) {
         int bestDist = Integer.MAX_VALUE;
         int bestX = -1;
