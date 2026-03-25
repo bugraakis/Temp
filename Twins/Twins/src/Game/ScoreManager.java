@@ -15,8 +15,8 @@ public class ScoreManager {
 
     public ScoreManager() {
         this.score = 0;
-        this.health = 100;
-        this.maxHealth = 100;
+        this.health = 1000;
+        this.maxHealth = 1000;
     }
 
     public void addScore(int points) {
@@ -37,14 +37,14 @@ public class ScoreManager {
         return health > 0;
     }
 
-    public void drawHUD(Console cn, int ammo) {
+    public void drawHUD(Console cn, int ammo, int computerScore, int cRobots, int xRobots, int ticks) {
         TextAttributes hudColor = new TextAttributes(Color.CYAN, Color.BLACK);
         TextAttributes scoreColor = new TextAttributes(Color.GREEN, Color.BLACK);
         TextAttributes healthColor;
 
-        if (health > 60) {
+        if (health > 600) {
             healthColor = new TextAttributes(Color.GREEN, Color.BLACK);
-        } else if (health > 30) {
+        } else if (health > 300) {
             healthColor = new TextAttributes(Color.YELLOW, Color.BLACK);
         } else {
             healthColor = new TextAttributes(Color.RED, Color.BLACK);
@@ -55,21 +55,20 @@ public class ScoreManager {
 
         clearHUDArea(cn);
 
-        drawString(cn, HUD_X, HUD_Y, "SCORE: ", labelColor);
-        drawString(cn, HUD_X + 7, HUD_Y, "" + score, scoreColor);
+        int timeInSeconds = ticks / 20;
+        drawString(cn, HUD_X, HUD_Y, "Time : " + timeInSeconds, labelColor);
 
-        drawString(cn, HUD_X, HUD_Y + 2, "HEALTH: ", labelColor);
-        drawString(cn, HUD_X + 8, HUD_Y + 2, "" + health + "/" + maxHealth, healthColor);
+        drawString(cn, HUD_X, HUD_Y + 2, "P.Score : " + score, scoreColor);
+        drawString(cn, HUD_X, HUD_Y + 3, "P.Life  : " + health, healthColor);
+        drawString(cn, HUD_X, HUD_Y + 4, "P.Laser : " + ammo, ammoColor);
 
-        drawHealthBar(cn, HUD_X, HUD_Y + 3, healthColor);
+        drawString(cn, HUD_X, HUD_Y + 6, "C.Score : " + computerScore, new TextAttributes(Color.RED, Color.BLACK));
+        drawString(cn, HUD_X, HUD_Y + 7, "C-Robots: " + cRobots, labelColor);
+        drawString(cn, HUD_X, HUD_Y + 8, "X-Robots: " + xRobots, labelColor);
 
-        drawString(cn, HUD_X, HUD_Y + 5, "AMMO: ", labelColor);
-        drawString(cn, HUD_X + 6, HUD_Y + 5, "" + ammo, ammoColor);
-
-        drawString(cn, HUD_X, HUD_Y + 8, "[SPACE] Shoot", hudColor);
-        drawString(cn, HUD_X, HUD_Y + 9, "[M] Toggle Mode", hudColor);
-        drawString(cn, HUD_X, HUD_Y + 10, "[ESC] Save/Quit", hudColor);
-        drawString(cn, HUD_X, HUD_Y + 12, "* = Laser Pack", ammoColor);
+        drawString(cn, HUD_X, HUD_Y + 10, "[SPACE] Shoot", hudColor);
+        drawString(cn, HUD_X, HUD_Y + 11, "[M] Toggle Mode", hudColor);
+        drawString(cn, HUD_X, HUD_Y + 12, "[ESC] Save/Quit", hudColor);
     }
 
     private void drawHealthBar(Console cn, int x, int y, TextAttributes color) {

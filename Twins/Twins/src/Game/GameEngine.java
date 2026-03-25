@@ -22,6 +22,8 @@ public class GameEngine {
 
     private LaserManager laserManager;
     private ScoreManager scoreManager;
+    private TreasureManager treasureManager;
+    private GameInputSystem inputSystem;
 
     private int px, py;
     private int selectedModeOption = 1;
@@ -41,6 +43,8 @@ public class GameEngine {
 
         laserManager = new LaserManager();
         scoreManager = new ScoreManager();
+        treasureManager = new TreasureManager();
+        inputSystem = new GameInputSystem();
     }
 
     private void clearScreen() {
@@ -86,6 +90,8 @@ public class GameEngine {
 
             laserManager = new LaserManager();
             scoreManager = new ScoreManager();
+            treasureManager = new TreasureManager();
+            inputSystem = new GameInputSystem();
             RandomSpawner spawner = new RandomSpawner();
 
             if (selectedModeOption == 1) {
@@ -96,15 +102,9 @@ public class GameEngine {
                 py = playerSpawn[1];
                 twin = new BCharacter(px, py);
 
-                // Spawn 3 robots
-                for (int i = 0; i < 3; i++) {
-                    int[] robotSpawn = spawner.getSpawnPoint(board.getMap());
-                    enemyManager.addXRobot(robotSpawn[0], robotSpawn[1], 500);
-                }
-
-                // Spawn initial packed lasers on the map
-                for (int i = 0; i < 5; i++) {
-                    laserManager.spawnPackedLaser(board.getMap(), spawner);
+                // Spawn initial 10 elements via game input system
+                for (int i = 0; i < 10; i++) {
+                    inputSystem.spawnElement(board.getMap(), treasureManager, laserManager, enemyManager);
                 }
 
             } else {
@@ -151,9 +151,9 @@ public class GameEngine {
                     enemyManager.addXRobot(xRobotX[i], xRobotY[i], xRobotLife[i]);
                 }
 
-                // Spawn packed lasers for loaded games too
-                for (int i = 0; i < 5; i++) {
-                    laserManager.spawnPackedLaser(board.getMap(), spawner);
+                // Spawn initial 10 elements for loaded games too
+                for (int i = 0; i < 10; i++) {
+                    inputSystem.spawnElement(board.getMap(), treasureManager, laserManager, enemyManager);
                 }
             }
 
@@ -161,8 +161,10 @@ public class GameEngine {
             cn.getTextWindow().output((px * 2) + 4, py + 2, 'A');
             twin.draw(cn, px, py);
             enemyManager.drawRobots(cn);
+            treasureManager.drawTreasures(cn);
             laserManager.drawPacks(cn);
-            scoreManager.drawHUD(cn, laserManager.getAmmo());
+            scoreManager.drawHUD(cn, laserManager.getAmmo(), enemyManager.getComputerScore(),
+                    enemyManager.getCRobotCount(), enemyManager.getXRobotCount(), timer.getTicks());
 
             boolean gameOver = false;
 
@@ -213,13 +215,9 @@ public class GameEngine {
                         modeManager.toggleMode();
                     }
 
-                    // SPACE to fire laser
+                    // SPACE to fire laser from A to B
                     if (key == KeyEvent.VK_SPACE) {
-                        int lastDirX = tracker.getSameDirX();
-                        int lastDirY = tracker.getSameDirY();
-                        if (lastDirX != 0 || lastDirY != 0) {
-                            laserManager.fireLaser(px, py, lastDirX, lastDirY, currentTick);
-                        }
+                        laserManager.fireLaser(px, py, twin.getX(), twin.getY(), currentTick);
                     }
 
                     if (key == KeyEvent.VK_LEFT)      { nextX--; moveX = -1; playerMoved = true; }
@@ -240,28 +238,38 @@ public class GameEngine {
                         twin.move(tracker, board, modeManager.getMode(), trailManager, currentTick, enemyManager);
                     }
 
-                    // Check laser pack pickups
-                    int picked = laserManager.checkPickups(px, py, cn);
-                    if (picked > 0) {
-                        scoreManager.addScore(5 * picked);
-                    }
+                    // Check laser pack pickups for A
+                    laserManager.checkPickups(px, py, cn);
+                    // Check laser pack pickups for B
+                    laserManager.checkPickupB(twin.getX(), twin.getY(), cn);
+
+                    // Check treasure pickups for A and B
+                    int tPoints = treasureManager.checkPlayerPickup(px, py, cn);
+                    if (tPoints > 0) scoreManager.addScore(tPoints);
+                    tPoints = treasureManager.checkPlayerPickup(twin.getX(), twin.getY(), cn);
+                    if (tPoints > 0) scoreManager.addScore(tPoints);
                 }
 
                 if (!gameOver) {
-                    // Update lasers - advance them and check for robot hits
-                    int kills = laserManager.updateLasers(board.getMap(), enemyManager, cn);
+                    // Update laser firing (spread one block per tick)
+                    laserManager.updateFiring(board.getMap(), currentTick);
+
+                    // Check neighbor damage from laser blocks to robots
+                    int kills = laserManager.checkNeighborDamage(enemyManager, cn);
                     if (kills > 0) {
-                        scoreManager.addScore(10 * kills);
+                        scoreManager.addScore(100 * kills);
                     }
-                    laserManager.cleanInactiveLasers(cn);
+
+                    // Remove expired laser blocks (lifetime 100 ticks)
+                    laserManager.cleanExpiredLasers(cn, currentTick);
 
                     if (timer.isRobotTurn()) {
-                        enemyManager.moveRobots(board, trailManager, currentTick, px, py, twin);
+                        enemyManager.moveRobots(board, trailManager, currentTick, px, py, twin, treasureManager);
                     }
 
-                    // Check if robots are adjacent to player - take damage
+                    // Check if robots are adjacent to player A - take 50 damage
                     if (enemyManager.isAdjacentToPlayer(px, py)) {
-                        scoreManager.takeDamage(2);
+                        scoreManager.takeDamage(50);
                     }
 
                     // Check if player is dead
@@ -270,9 +278,9 @@ public class GameEngine {
                         scoreManager.drawGameOver(cn);
                     }
 
-                    // Spawn new packed lasers periodically
-                    if (currentTick % 200 == 0 && laserManager.getPackCount() < 20) {
-                        laserManager.spawnPackedLaser(board.getMap(), spawner);
+                    // Game input system: spawn new element every 20 ticks (1 second)
+                    if (currentTick % 20 == 0 && currentTick > 0) {
+                        inputSystem.spawnElement(board.getMap(), treasureManager, laserManager, enemyManager);
                     }
                 }
 
@@ -281,10 +289,12 @@ public class GameEngine {
                 cn.getTextWindow().output((px * 2) + 4, py + 2, 'A');
                 twin.draw(cn, px, py);
                 enemyManager.drawRobots(cn);
+                treasureManager.drawTreasures(cn);
                 laserManager.drawLasers(cn);
                 laserManager.drawPacks(cn);
-                scoreManager.drawHUD(cn, laserManager.getAmmo());
-                
+                scoreManager.drawHUD(cn, laserManager.getAmmo(), enemyManager.getComputerScore(),
+                        enemyManager.getCRobotCount(), enemyManager.getXRobotCount(), currentTick);
+
             }
         }
     }
