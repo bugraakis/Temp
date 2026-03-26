@@ -28,11 +28,6 @@ public class ScoreManager {
         if (health < 0) health = 0;
     }
 
-    public void heal(int amount) {
-        health += amount;
-        if (health > maxHealth) health = maxHealth;
-    }
-
     public boolean isAlive() {
         return health > 0;
     }
