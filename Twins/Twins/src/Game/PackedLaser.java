@@ -23,7 +23,7 @@ public class PackedLaser {
         TextAttributes color = new TextAttributes(Color.YELLOW, Color.BLACK);
         int screenX = (x * 2) + OFFSET_X;
         int screenY = y + OFFSET_Y;
-        cn.getTextWindow().output(screenX, screenY, '*', color);
+        cn.getTextWindow().output(screenX, screenY, '@', color);
     }
 
     public void erase(Console cn) {

@@ -15,8 +15,8 @@ public class ScoreManager {
 
     public ScoreManager() {
         this.score = 0;
-        this.health = 100;
-        this.maxHealth = 100;
+        this.health = 1000;
+        this.maxHealth = 1000;
     }
 
     public void addScore(int points) {
@@ -42,9 +42,9 @@ public class ScoreManager {
         TextAttributes scoreColor = new TextAttributes(Color.GREEN, Color.BLACK);
         TextAttributes healthColor;
 
-        if (health > 60) {
+        if (health > 600) {
             healthColor = new TextAttributes(Color.GREEN, Color.BLACK);
-        } else if (health > 30) {
+        } else if (health > 300) {
             healthColor = new TextAttributes(Color.YELLOW, Color.BLACK);
         } else {
             healthColor = new TextAttributes(Color.RED, Color.BLACK);
@@ -69,7 +69,7 @@ public class ScoreManager {
         drawString(cn, HUD_X, HUD_Y + 8, "[SPACE] Shoot", hudColor);
         drawString(cn, HUD_X, HUD_Y + 9, "[M] Toggle Mode", hudColor);
         drawString(cn, HUD_X, HUD_Y + 10, "[ESC] Save/Quit", hudColor);
-        drawString(cn, HUD_X, HUD_Y + 12, "* = Laser Pack", ammoColor);
+        drawString(cn, HUD_X, HUD_Y + 12, "@ = Laser Pack", ammoColor);
     }
 
     private void drawHealthBar(Console cn, int x, int y, TextAttributes color) {

@@ -213,13 +213,9 @@ public class GameEngine {
                         modeManager.toggleMode();
                     }
 
-                    // SPACE to fire laser
+                    // SPACE to fire laser from A to B
                     if (key == KeyEvent.VK_SPACE) {
-                        int lastDirX = tracker.getSameDirX();
-                        int lastDirY = tracker.getSameDirY();
-                        if (lastDirX != 0 || lastDirY != 0) {
-                            laserManager.fireLaser(px, py, lastDirX, lastDirY, currentTick);
-                        }
+                        laserManager.fireLaser(px, py, twin.getX(), twin.getY(), currentTick);
                     }
 
                     if (key == KeyEvent.VK_LEFT)      { nextX--; moveX = -1; playerMoved = true; }
@@ -240,28 +236,33 @@ public class GameEngine {
                         twin.move(tracker, board, modeManager.getMode(), trailManager, currentTick, enemyManager);
                     }
 
-                    // Check laser pack pickups
-                    int picked = laserManager.checkPickups(px, py, cn);
-                    if (picked > 0) {
-                        scoreManager.addScore(5 * picked);
-                    }
+                    // Check laser pack pickups for A
+                    laserManager.checkPickups(px, py, cn);
+                    // Check laser pack pickups for B
+                    laserManager.checkPickups(twin.getX(), twin.getY(), cn);
                 }
 
                 if (!gameOver) {
-                    // Update lasers - advance them and check for robot hits
-                    int kills = laserManager.updateLasers(board.getMap(), enemyManager, cn);
+                    // Update laser spread
+                    laserManager.updateSpread(board.getMap(), currentTick);
+
+                    // Laser neighbor harming
+                    int kills = laserManager.neighborHarm(enemyManager, cn);
                     if (kills > 0) {
-                        scoreManager.addScore(10 * kills);
+                        scoreManager.addScore(100 * kills);
                     }
-                    laserManager.cleanInactiveLasers(cn);
+
+                    // Clean expired laser blocks
+                    laserManager.cleanExpiredLasers(cn, currentTick);
 
                     if (timer.isRobotTurn()) {
                         enemyManager.moveRobots(board, trailManager, currentTick, px, py, twin);
                     }
 
-                    // Check if robots are adjacent to player - take damage
-                    if (enemyManager.isAdjacentToPlayer(px, py)) {
-                        scoreManager.takeDamage(2);
+                    // Check if robots are adjacent to player A - take damage (50 per adjacent robot)
+                    int adjacentRobots = enemyManager.countAdjacentToPlayer(px, py);
+                    if (adjacentRobots > 0) {
+                        scoreManager.takeDamage(adjacentRobots * 50);
                     }
 
                     // Check if player is dead

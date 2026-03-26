@@ -79,13 +79,18 @@ public class EnemyManager {
     }
 
     public boolean isAdjacentToPlayer(int playerX, int playerY) {
+        return countAdjacentToPlayer(playerX, playerY) > 0;
+    }
+
+    public int countAdjacentToPlayer(int playerX, int playerY) {
+        int count = 0;
         for (int i = 0; i < robotCount; i++) {
-            int dx = xRobots[i].x - playerX;
-            int dy = xRobots[i].y - playerY;
-            if (dx >= -1 && dx <= 1 && dy >= -1 && dy <= 1) {
-                return true;
+            int dx = Math.abs(xRobots[i].x - playerX);
+            int dy = Math.abs(xRobots[i].y - playerY);
+            if ((dx == 1 && dy == 0) || (dx == 0 && dy == 1)) {
+                count++;
             }
         }
-        return false;
+        return count;
     }
 }
