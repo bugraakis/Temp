@@ -84,12 +84,44 @@ public class ScoreManager {
     }
 
     public void drawGameOver(Console cn) {
-        TextAttributes gameOverColor = new TextAttributes(new Color(255, 50, 50), Color.BLACK);
-        TextAttributes scoreColor = new TextAttributes(new Color(255, 255, 0), Color.BLACK);
+        TextAttributes bgColor = new TextAttributes(Color.BLACK, Color.BLACK);
+        for (int row = 0; row < 50; row++) {
+            for (int col = 0; col < 200; col++) {
+                cn.getTextWindow().output(col, row, ' ', bgColor);
+            }
+        }
 
-        drawString(cn, HUD_X, HUD_Y + 15, "GAME OVER!", gameOverColor);
-        drawString(cn, HUD_X, HUD_Y + 16, "Final Score: " + score, scoreColor);
-        drawString(cn, HUD_X, HUD_Y + 18, "Press ESC to exit", new TextAttributes(new Color(0, 255, 255), Color.BLACK));
+        TextAttributes redColor = new TextAttributes(new Color(255, 50, 50), Color.BLACK);
+        TextAttributes scoreColor = new TextAttributes(new Color(255, 255, 0), Color.BLACK);
+        TextAttributes hintColor = new TextAttributes(new Color(0, 255, 255), Color.BLACK);
+        TextAttributes lineColor = new TextAttributes(new Color(100, 100, 100), Color.BLACK);
+
+        String[] gameOverArt = {
+            "  ____    _    __  __ _____    _____     _______ ____  ",
+            " / ___|  / \\  |  \\/  | ____|  / _ \\ \\   / / ____|  _ \\ ",
+            "| |  _  / _ \\ | |\\/| |  _|   | | | \\ \\ / /|  _| | |_) |",
+            "| |_| |/ ___ \\| |  | | |___  | |_| |\\ V / | |___|  _ < ",
+            " \\____/_/   \\_\\_|  |_|_____|  \\___/  \\_/  |_____|_| \\_\\"
+        };
+
+        int artX = 72;
+        int artY = 12;
+        for (int i = 0; i < gameOverArt.length; i++) {
+            drawString(cn, artX, artY + i, gameOverArt[i], redColor);
+        }
+
+        String scoreLine = "FINAL SCORE: " + score;
+        int scoreX = 100 - (scoreLine.length() / 2);
+        drawString(cn, scoreX, artY + 8, scoreLine, scoreColor);
+
+        String divider = "- - - - - - - - - - - - - - - - - -";
+        int divX = 100 - (divider.length() / 2);
+        drawString(cn, divX, artY + 6, divider, lineColor);
+        drawString(cn, divX, artY + 10, divider, lineColor);
+
+        String hint = "Press ESC to return to menu";
+        int hintX = 100 - (hint.length() / 2);
+        drawString(cn, hintX, artY + 13, hint, hintColor);
     }
 
     private void clearHUDArea(Console cn) {
