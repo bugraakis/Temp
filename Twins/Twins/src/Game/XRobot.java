@@ -49,7 +49,7 @@ public class XRobot {
     }
 
     public void draw(Console cn) {
-        TextAttributes robotColor = new TextAttributes(new Color(255, 100, 0), Color.BLACK);
+        TextAttributes robotColor = new TextAttributes(new Color(100, 180, 255), Color.BLACK);
         cn.getTextWindow().output((x * 2) + 4, y + 2, 'X', robotColor);
     }
 }

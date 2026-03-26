@@ -79,7 +79,7 @@ public class GameEngine {
     private void drawTreasures() {
         TextAttributes t1Color = new TextAttributes(new Color(255, 255, 0), Color.BLACK);
         TextAttributes t2Color = new TextAttributes(new Color(255, 165, 0), Color.BLACK);
-        TextAttributes t3Color = new TextAttributes(new Color(255, 0, 255), Color.BLACK);
+        TextAttributes t3Color = new TextAttributes(new Color(255, 100, 255), Color.BLACK);
         for (int i = 0; i < tCount; i++) {
             if (!tActive[i]) continue;
             int screenX = (tX[i] * 2) + 4;
@@ -353,7 +353,7 @@ public class GameEngine {
                 enemyManager.drawRobots(cn);
                 TextAttributes playerColor = (modeManager.getMode() == 1)
                     ? new TextAttributes(new Color(57, 255, 20), Color.BLACK)
-                    : new TextAttributes(new Color(255, 0, 255), Color.BLACK);
+                    : new TextAttributes(new Color(255, 100, 255), Color.BLACK);
                 cn.getTextWindow().output((px * 2) + 4, py + 2, 'A', playerColor);
                 twin.draw(cn, px, py, playerColor);
                 scoreManager.drawHUD(cn, laserManager.getAmmo());
