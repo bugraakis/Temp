@@ -37,13 +37,13 @@ public class LaserManager {
             if (e2 > -dy) { err -= dy; x0 += sx; }
             if (e2 < dx) { err += dx; y0 += sy; }
 
+            if (x0 == x1 && y0 == y1) break;
+
             if (spreadLength < spreadPath.length) {
                 spreadPath[spreadLength][0] = x0;
                 spreadPath[spreadLength][1] = y0;
                 spreadLength++;
             }
-
-            if (x0 == x1 && y0 == y1) break;
         }
 
         if (spreadLength > 0) {
