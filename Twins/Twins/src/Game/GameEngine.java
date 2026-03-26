@@ -119,7 +119,7 @@ public class GameEngine {
             laserManager.spawnPackedLaser(board.getMap(), spawner);
         } else if (roll == 9) {
             int[] pos = spawner.getSpawnPoint(board.getMap());
-            enemyManager.addXRobot(pos[0], pos[1], 1000);
+            enemyManager.addCRobot(pos[0], pos[1], 1000);
         } else {
             int[] pos = spawner.getSpawnPoint(board.getMap());
             enemyManager.addXRobot(pos[0], pos[1], 1000);
@@ -345,6 +345,7 @@ public class GameEngine {
 
                     if (timer.isRobotTurn()) {
                         enemyManager.moveRobots(board, trailManager, currentTick, px, py, twin);
+                        enemyManager.moveCRobots(board, trailManager, currentTick, px, py, twin, tX, tY, tActive, tCount);
                         // Robots collect treasures (treasures disappear)
                         for (int i = 0; i < enemyManager.getRobotCount(); i++) {
                             collectTreasure(enemyManager.getRobotX(i), enemyManager.getRobotY(i));
