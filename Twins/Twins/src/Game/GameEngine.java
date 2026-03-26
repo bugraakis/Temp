@@ -129,11 +129,9 @@ public class GameEngine {
     public void start() throws InterruptedException, IOException {
 
         // Confirmation screen - resize window first
-        TextAttributes titleColor = new TextAttributes(new Color(255, 0, 255), Color.BLACK);
         TextAttributes hintColor = new TextAttributes(new Color(0, 255, 255), Color.BLACK);
         TextAttributes dimColor = new TextAttributes(new Color(100, 100, 100), Color.BLACK);
 
-        drawText(75, 18, "T W I N S", titleColor);
         drawText(68, 22, "Please resize your window", hintColor);
         drawText(66, 23, "to fit the game area properly.", hintColor);
         drawText(65, 27, "Press ENTER when you are ready...", dimColor);
