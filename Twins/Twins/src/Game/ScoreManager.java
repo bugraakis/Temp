@@ -10,8 +10,8 @@ public class ScoreManager {
     private int health;
     private int maxHealth;
 
-    private static final int HUD_X = 120;
-    private static final int HUD_Y = 2;
+    private int HUD_X = 120;
+    private int HUD_Y = 2;
 
     public ScoreManager() {
         this.score = 0;

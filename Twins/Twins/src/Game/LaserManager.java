@@ -23,25 +23,56 @@ public class LaserManager {
         if (ax == bx && ay == by) return;
         if (spreading) return;
 
-        // Compute path from A to B using Bresenham line
+        // Compute path from A to B using simple step-by-step line
         spreadLength = 0;
-        int x0 = ax, y0 = ay, x1 = bx, y1 = by;
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
-        int sx = x0 < x1 ? 1 : -1;
-        int sy = y0 < y1 ? 1 : -1;
-        int err = dx - dy;
+        int currentX = ax;
+        int currentY = ay;
 
-        while (true) {
-            int e2 = 2 * err;
-            if (e2 > -dy) { err -= dy; x0 += sx; }
-            if (e2 < dx) { err += dx; y0 += sy; }
+        // Calculate total distance in X and Y
+        int totalDX = bx - ax;
+        int totalDY = by - ay;
 
-            if (x0 == x1 && y0 == y1) break;
+        // Find step direction for X and Y
+        int stepX = 0;
+        if (totalDX > 0) stepX = 1;
+        if (totalDX < 0) stepX = -1;
+
+        int stepY = 0;
+        if (totalDY > 0) stepY = 1;
+        if (totalDY < 0) stepY = -1;
+
+        int absDX = Math.abs(totalDX);
+        int absDY = Math.abs(totalDY);
+
+        // Use the longer axis to determine number of steps
+        int steps = absDX;
+        if (absDY > absDX) {
+            steps = absDY;
+        }
+
+        for (int step = 0; step < steps; step++) {
+            // Move along the longer axis each step
+            // Move along the shorter axis proportionally
+            if (absDX >= absDY) {
+                currentX = currentX + stepX;
+                // Check if we need to move Y this step
+                if (absDY > 0 && step * absDY / absDX != (step + 1) * absDY / absDX) {
+                    currentY = currentY + stepY;
+                }
+            } else {
+                currentY = currentY + stepY;
+                // Check if we need to move X this step
+                if (absDX > 0 && step * absDX / absDY != (step + 1) * absDX / absDY) {
+                    currentX = currentX + stepX;
+                }
+            }
+
+            // Skip the B position (don't place laser on B)
+            if (currentX == bx && currentY == by) break;
 
             if (spreadLength < spreadPath.length) {
-                spreadPath[spreadLength][0] = x0;
-                spreadPath[spreadLength][1] = y0;
+                spreadPath[spreadLength][0] = currentX;
+                spreadPath[spreadLength][1] = currentY;
                 spreadLength++;
             }
         }

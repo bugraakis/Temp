@@ -23,7 +23,7 @@ public class CRobot {
     public void move(GameBoard board, EnemyManager enemies, int px, int py, BCharacter twin,
                      int[] tX, int[] tY, boolean[] tActive, int tCount) {
         // Find nearest treasure by Manhattan distance
-        int bestDist = Integer.MAX_VALUE;
+        int bestDist = 99999;
         int targetX = x;
         int targetY = y;
         for (int i = 0; i < tCount; i++) {
@@ -36,7 +36,7 @@ public class CRobot {
             }
         }
 
-        if (bestDist == Integer.MAX_VALUE) return;
+        if (bestDist == 99999) return;
 
         // Try to move toward treasure - prefer larger axis difference
         int dx = targetX - x;
@@ -48,11 +48,21 @@ public class CRobot {
         int moveX2 = 0, moveY2 = 0;
 
         if (Math.abs(dx) >= Math.abs(dy)) {
-            moveX1 = (dx > 0) ? 1 : (dx < 0) ? -1 : 0;
-            moveY2 = (dy > 0) ? 1 : (dy < 0) ? -1 : 0;
+            // Primary direction is horizontal
+            if (dx > 0) moveX1 = 1;
+            else if (dx < 0) moveX1 = -1;
+
+            // Secondary direction is vertical
+            if (dy > 0) moveY2 = 1;
+            else if (dy < 0) moveY2 = -1;
         } else {
-            moveY1 = (dy > 0) ? 1 : (dy < 0) ? -1 : 0;
-            moveX2 = (dx > 0) ? 1 : (dx < 0) ? -1 : 0;
+            // Primary direction is vertical
+            if (dy > 0) moveY1 = 1;
+            else if (dy < 0) moveY1 = -1;
+
+            // Secondary direction is horizontal
+            if (dx > 0) moveX2 = 1;
+            else if (dx < 0) moveX2 = -1;
         }
 
         if (moveX1 != 0 || moveY1 != 0) {

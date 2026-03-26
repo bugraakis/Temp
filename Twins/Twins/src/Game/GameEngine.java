@@ -90,8 +90,17 @@ public class GameEngine {
             if (!tActive[i]) continue;
             int screenX = (tX[i] * 2) + 4;
             int screenY = tY[i] + 2;
-            TextAttributes c = (tVal[i] == 1) ? t1Color : (tVal[i] == 2) ? t2Color : t3Color;
-            cn.getTextWindow().output(screenX, screenY, (char)('0' + tVal[i]), c);
+            TextAttributes c;
+            if (tVal[i] == 1) c = t1Color;
+            else if (tVal[i] == 2) c = t2Color;
+            else c = t3Color;
+
+            char symbol;
+            if (tVal[i] == 1) symbol = '1';
+            else if (tVal[i] == 2) symbol = '2';
+            else symbol = '3';
+
+            cn.getTextWindow().output(screenX, screenY, symbol, c);
         }
     }
 
@@ -161,7 +170,11 @@ public class GameEngine {
                 int key = controls.consumeKey();
                 if (key != 0) {
                     if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
-                        selectedModeOption = (selectedModeOption == 1) ? 2 : 1;
+                        if (selectedModeOption == 1) {
+                            selectedModeOption = 2;
+                        } else {
+                            selectedModeOption = 1;
+                        }
                     } else if (key == KeyEvent.VK_ENTER) {
                         inMenu = false;
                     }
@@ -377,9 +390,12 @@ public class GameEngine {
                     laserManager.drawPacks(cn);
                     laserManager.drawLasers(cn);
                     enemyManager.drawRobots(cn);
-                    TextAttributes playerColor = (modeManager.getMode() == 1)
-                        ? new TextAttributes(new Color(57, 255, 20), Color.BLACK)
-                        : new TextAttributes(new Color(255, 100, 255), Color.BLACK);
+                    TextAttributes playerColor;
+                    if (modeManager.getMode() == 1) {
+                        playerColor = new TextAttributes(new Color(57, 255, 20), Color.BLACK);
+                    } else {
+                        playerColor = new TextAttributes(new Color(255, 100, 255), Color.BLACK);
+                    }
                     cn.getTextWindow().output((px * 2) + 4, py + 2, 'A', playerColor);
                     twin.draw(cn, px, py, playerColor);
                     scoreManager.drawHUD(cn, laserManager.getAmmo());

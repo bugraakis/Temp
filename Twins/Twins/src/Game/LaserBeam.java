@@ -10,8 +10,8 @@ public class LaserBeam {
     private boolean active;
     private int spawnTick;
 
-    private static final int OFFSET_X = 4;
-    private static final int OFFSET_Y = 2;
+    private int OFFSET_X = 4;
+    private int OFFSET_Y = 2;
 
     public LaserBeam(int x, int y, int spawnTick) {
         this.x = x;
