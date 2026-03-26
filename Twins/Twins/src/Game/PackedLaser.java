@@ -20,7 +20,7 @@ public class PackedLaser {
 
     public void draw(Console cn) {
         if (collected) return;
-        TextAttributes color = new TextAttributes(Color.YELLOW, Color.BLACK);
+        TextAttributes color = new TextAttributes(new Color(0, 255, 255), Color.BLACK);
         int screenX = (x * 2) + OFFSET_X;
         int screenY = y + OFFSET_Y;
         cn.getTextWindow().output(screenX, screenY, '@', color);

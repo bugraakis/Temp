@@ -1,7 +1,9 @@
 package Game;
 
 import enigma.console.Console;
+import enigma.console.TextAttributes;
 import enigma.core.Enigma;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
@@ -75,11 +77,15 @@ public class GameEngine {
     }
 
     private void drawTreasures() {
+        TextAttributes t1Color = new TextAttributes(new Color(255, 255, 0), Color.BLACK);
+        TextAttributes t2Color = new TextAttributes(new Color(255, 165, 0), Color.BLACK);
+        TextAttributes t3Color = new TextAttributes(new Color(255, 0, 255), Color.BLACK);
         for (int i = 0; i < tCount; i++) {
             if (!tActive[i]) continue;
             int screenX = (tX[i] * 2) + 4;
             int screenY = tY[i] + 2;
-            cn.getTextWindow().output(screenX, screenY, (char)('0' + tVal[i]));
+            TextAttributes c = (tVal[i] == 1) ? t1Color : (tVal[i] == 2) ? t2Color : t3Color;
+            cn.getTextWindow().output(screenX, screenY, (char)('0' + tVal[i]), c);
         }
     }
 
@@ -212,8 +218,9 @@ public class GameEngine {
 
             board.printBoard(cn);
             drawTreasures();
-            cn.getTextWindow().output((px * 2) + 4, py + 2, 'A');
-            twin.draw(cn, px, py);
+            TextAttributes initColor = new TextAttributes(new Color(57, 255, 20), Color.BLACK);
+            cn.getTextWindow().output((px * 2) + 4, py + 2, 'A', initColor);
+            twin.draw(cn, px, py, initColor);
             enemyManager.drawRobots(cn);
             laserManager.drawPacks(cn);
             scoreManager.drawHUD(cn, laserManager.getAmmo());
@@ -344,8 +351,11 @@ public class GameEngine {
                 laserManager.drawPacks(cn);
                 laserManager.drawLasers(cn);
                 enemyManager.drawRobots(cn);
-                cn.getTextWindow().output((px * 2) + 4, py + 2, 'A');
-                twin.draw(cn, px, py);
+                TextAttributes playerColor = (modeManager.getMode() == 1)
+                    ? new TextAttributes(new Color(57, 255, 20), Color.BLACK)
+                    : new TextAttributes(new Color(255, 0, 255), Color.BLACK);
+                cn.getTextWindow().output((px * 2) + 4, py + 2, 'A', playerColor);
+                twin.draw(cn, px, py, playerColor);
                 scoreManager.drawHUD(cn, laserManager.getAmmo());
                 
             }

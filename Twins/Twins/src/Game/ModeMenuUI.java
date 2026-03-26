@@ -13,9 +13,9 @@ public class ModeMenuUI {
     }
 
     public void drawMenu(Console cn, int selectedOption, int startX, int startY) {
-        TextAttributes cyanColor  = new TextAttributes(Color.CYAN, Color.BLACK);
-        TextAttributes grayColor  = new TextAttributes(Color.LIGHT_GRAY, Color.BLACK);
-        TextAttributes whiteColor = new TextAttributes(Color.WHITE, Color.BLACK);
+        TextAttributes cyanColor  = new TextAttributes(new Color(57, 255, 20), Color.BLACK);
+        TextAttributes grayColor  = new TextAttributes(new Color(100, 100, 100), Color.BLACK);
+        TextAttributes whiteColor = new TextAttributes(new Color(0, 255, 255), Color.BLACK);
 
         drawText(cn, startX, startY,     "   --- GAME MODE SELECTION ---   ", cyanColor);
 

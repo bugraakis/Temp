@@ -33,20 +33,20 @@ public class ScoreManager {
     }
 
     public void drawHUD(Console cn, int ammo) {
-        TextAttributes hudColor = new TextAttributes(Color.CYAN, Color.BLACK);
-        TextAttributes scoreColor = new TextAttributes(Color.GREEN, Color.BLACK);
+        TextAttributes hudColor = new TextAttributes(new Color(0, 255, 255), Color.BLACK);
+        TextAttributes scoreColor = new TextAttributes(new Color(57, 255, 20), Color.BLACK);
         TextAttributes healthColor;
 
         if (health > 600) {
-            healthColor = new TextAttributes(Color.GREEN, Color.BLACK);
+            healthColor = new TextAttributes(new Color(57, 255, 20), Color.BLACK);
         } else if (health > 300) {
-            healthColor = new TextAttributes(Color.YELLOW, Color.BLACK);
+            healthColor = new TextAttributes(new Color(255, 255, 0), Color.BLACK);
         } else {
-            healthColor = new TextAttributes(Color.RED, Color.BLACK);
+            healthColor = new TextAttributes(new Color(255, 50, 50), Color.BLACK);
         }
 
-        TextAttributes ammoColor = new TextAttributes(Color.YELLOW, Color.BLACK);
-        TextAttributes labelColor = new TextAttributes(Color.WHITE, Color.BLACK);
+        TextAttributes ammoColor = new TextAttributes(new Color(255, 255, 0), Color.BLACK);
+        TextAttributes labelColor = new TextAttributes(new Color(0, 255, 255), Color.BLACK);
 
         clearHUDArea(cn);
 
@@ -64,15 +64,15 @@ public class ScoreManager {
         drawString(cn, HUD_X, HUD_Y + 8, "[SPACE] Shoot", hudColor);
         drawString(cn, HUD_X, HUD_Y + 9, "[M] Toggle Mode", hudColor);
         drawString(cn, HUD_X, HUD_Y + 10, "[ESC] Save/Quit", hudColor);
-        drawString(cn, HUD_X, HUD_Y + 12, "@ = Laser Pack", ammoColor);
+        drawString(cn, HUD_X, HUD_Y + 12, "@ = Laser Pack", new TextAttributes(new Color(0, 255, 255), Color.BLACK));
     }
 
     private void drawHealthBar(Console cn, int x, int y, TextAttributes color) {
-        TextAttributes emptyColor = new TextAttributes(Color.DARK_GRAY, Color.BLACK);
+        TextAttributes emptyColor = new TextAttributes(new Color(60, 60, 60), Color.BLACK);
         int barLength = 20;
         int filled = (health * barLength) / maxHealth;
 
-        drawString(cn, x, y, "[", new TextAttributes(Color.WHITE, Color.BLACK));
+        drawString(cn, x, y, "[", new TextAttributes(new Color(0, 255, 255), Color.BLACK));
         for (int i = 0; i < barLength; i++) {
             if (i < filled) {
                 drawChar(cn, x + 1 + i, y, '=', color);
@@ -80,16 +80,16 @@ public class ScoreManager {
                 drawChar(cn, x + 1 + i, y, '.', emptyColor);
             }
         }
-        drawString(cn, x + 1 + barLength, y, "]", new TextAttributes(Color.WHITE, Color.BLACK));
+        drawString(cn, x + 1 + barLength, y, "]", new TextAttributes(new Color(0, 255, 255), Color.BLACK));
     }
 
     public void drawGameOver(Console cn) {
-        TextAttributes gameOverColor = new TextAttributes(Color.RED, Color.BLACK);
-        TextAttributes scoreColor = new TextAttributes(Color.YELLOW, Color.BLACK);
+        TextAttributes gameOverColor = new TextAttributes(new Color(255, 50, 50), Color.BLACK);
+        TextAttributes scoreColor = new TextAttributes(new Color(255, 255, 0), Color.BLACK);
 
         drawString(cn, HUD_X, HUD_Y + 15, "GAME OVER!", gameOverColor);
         drawString(cn, HUD_X, HUD_Y + 16, "Final Score: " + score, scoreColor);
-        drawString(cn, HUD_X, HUD_Y + 18, "Press ESC to exit", new TextAttributes(Color.WHITE, Color.BLACK));
+        drawString(cn, HUD_X, HUD_Y + 18, "Press ESC to exit", new TextAttributes(new Color(0, 255, 255), Color.BLACK));
     }
 
     private void clearHUDArea(Console cn) {

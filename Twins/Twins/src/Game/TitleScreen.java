@@ -17,7 +17,7 @@ public class TitleScreen {
     };
 
     public void drawLogo(Console cn, int startX, int startY) {
-        TextAttributes color = new TextAttributes(Color.CYAN, Color.BLACK);
+        TextAttributes color = new TextAttributes(new Color(255, 0, 255), Color.BLACK);
         
         for (int i = 0; i < logoLines.length; i++) {
             for (int j = 0; j < logoLines[i].length(); j++) {

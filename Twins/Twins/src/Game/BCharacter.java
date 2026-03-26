@@ -1,6 +1,7 @@
 package Game;
 
 import enigma.console.Console;
+import enigma.console.TextAttributes;
 
 public class BCharacter {
     private int x;
@@ -31,9 +32,9 @@ public class BCharacter {
         }
     }
 
-    public void draw(Console cn, int playerX, int playerY) {
+    public void draw(Console cn, int playerX, int playerY, TextAttributes color) {
         if (this.x != playerX || this.y != playerY) {
-            cn.getTextWindow().output((this.x * 2) + 4, this.y + 2, 'B');
+            cn.getTextWindow().output((this.x * 2) + 4, this.y + 2, 'B', color);
         }
     }
 
