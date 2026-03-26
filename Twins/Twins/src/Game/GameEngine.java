@@ -345,18 +345,20 @@ public class GameEngine {
                     }
                 }
 
-                trailManager.clearOldTrails(cn, currentTick);
+                if (!gameOver) {
+                    trailManager.clearOldTrails(cn, currentTick);
 
-                drawTreasures();
-                laserManager.drawPacks(cn);
-                laserManager.drawLasers(cn);
-                enemyManager.drawRobots(cn);
-                TextAttributes playerColor = (modeManager.getMode() == 1)
-                    ? new TextAttributes(new Color(57, 255, 20), Color.BLACK)
-                    : new TextAttributes(new Color(255, 100, 255), Color.BLACK);
-                cn.getTextWindow().output((px * 2) + 4, py + 2, 'A', playerColor);
-                twin.draw(cn, px, py, playerColor);
-                scoreManager.drawHUD(cn, laserManager.getAmmo());
+                    drawTreasures();
+                    laserManager.drawPacks(cn);
+                    laserManager.drawLasers(cn);
+                    enemyManager.drawRobots(cn);
+                    TextAttributes playerColor = (modeManager.getMode() == 1)
+                        ? new TextAttributes(new Color(57, 255, 20), Color.BLACK)
+                        : new TextAttributes(new Color(255, 100, 255), Color.BLACK);
+                    cn.getTextWindow().output((px * 2) + 4, py + 2, 'A', playerColor);
+                    twin.draw(cn, px, py, playerColor);
+                    scoreManager.drawHUD(cn, laserManager.getAmmo());
+                }
                 
             }
         }
