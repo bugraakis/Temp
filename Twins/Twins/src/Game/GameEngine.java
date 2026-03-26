@@ -195,11 +195,11 @@ public class GameEngine {
                     drawText(70, 22, "No old maps please change your option");
                     drawText(70, 24, "Press ESC");
 
-                    boolean waiting = true;
-                    while (waiting) {
+                    boolean waitEsc = true;
+                    while (waitEsc) {
                         int key = controls.consumeKey();
                         if (key == KeyEvent.VK_ESCAPE) {
-                            waiting = false;
+                            waitEsc = false;
                         }
                         Thread.sleep(50);
                     }
