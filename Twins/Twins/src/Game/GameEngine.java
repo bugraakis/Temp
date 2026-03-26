@@ -66,6 +66,12 @@ public class GameEngine {
         }
     }
 
+    private void drawText(int x, int y, String text, TextAttributes attr) {
+        for (int i = 0; i < text.length(); i++) {
+            cn.getTextWindow().output(x + i, y, text.charAt(i), attr);
+        }
+    }
+
     private void spawnTreasure(int value, RandomSpawner spawner) {
         if (tCount >= tX.length) return;
         int[] pos = spawner.getSpawnPoint(board.getMap());
@@ -121,6 +127,26 @@ public class GameEngine {
     }
 
     public void start() throws InterruptedException, IOException {
+
+        // Confirmation screen - resize window first
+        TextAttributes titleColor = new TextAttributes(new Color(255, 0, 255), Color.BLACK);
+        TextAttributes hintColor = new TextAttributes(new Color(0, 255, 255), Color.BLACK);
+        TextAttributes dimColor = new TextAttributes(new Color(100, 100, 100), Color.BLACK);
+
+        drawText(75, 18, "T W I N S", titleColor);
+        drawText(68, 22, "Please resize your window", hintColor);
+        drawText(66, 23, "to fit the game area properly.", hintColor);
+        drawText(65, 27, "Press ENTER when you are ready...", dimColor);
+
+        boolean waiting = true;
+        while (waiting) {
+            int key = controls.consumeKey();
+            if (key == KeyEvent.VK_ENTER) {
+                waiting = false;
+            }
+            Thread.sleep(50);
+        }
+        clearScreen();
 
         while (true) {
             boolean inMenu = true;
